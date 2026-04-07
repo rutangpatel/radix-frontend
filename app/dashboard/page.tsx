@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { HomeTab } from '@/components/home-tab';
 import { HistoryTab } from '@/components/history-tab';
-import { ProfileTab } from '@/components/profile-tab';
+import { AdvancedProfileTab } from '@/components/advanced-profile-tab';
 import { BottomNav } from '@/components/bottom-nav';
 import { SendPaymentModal } from '@/components/send-payment-modal';
 import { PinVerificationModal } from '@/components/pin-verification-modal';
@@ -62,7 +62,7 @@ export default function Home() {
             />
           )}
           {activeTab === 'history' && <HistoryTab />}
-          {activeTab === 'profile' && <ProfileTab />}
+          {activeTab === 'profile' && <AdvancedProfileTab />}
         </div>
 
         {/* Bottom Navigation */}

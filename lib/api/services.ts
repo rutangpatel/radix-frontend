@@ -43,6 +43,42 @@ export const userService = {
       body: JSON.stringify(data),
     });
   },
+
+  updatePin: async (data: { old_pin: string; new_pin: string }) => {
+    return fetchWithAuth('/v1/users/update-pin', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  forgotPin: async (data: { password: string; new_pin: string }) => {
+    return fetchWithAuth('/v1/users/forgot-pin', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  updateRadixId: async (data: { name_in_id: boolean }) => {
+    return fetchWithAuth(`/v1/users/update?name_in_id=${data.name_in_id}`, {
+      method: 'PUT',
+    });
+  },
+
+  uploadProfilePhoto: async (imageFile: File) => {
+    const formData = new FormData();
+    formData.append('file', imageFile);
+
+    return fetchWithAuth('/v1/users/profile_photo', {
+      method: 'PUT',
+      body: formData,
+    });
+  },
+
+  deleteAccount: async () => {
+    return fetchWithAuth('/v1/users/delete', {
+      method: 'DELETE',
+    });
+  },
 };
 
 // --- C. Transactions ---
@@ -90,6 +126,30 @@ export const faceService = {
 
     return fetchWithAuth('/v1/face/pay', {
       method: 'POST',
+      body: formData,
+    });
+  },
+
+  enrollFace: async (imageFileList: File[]) => {
+    const formData = new FormData();
+    imageFileList.forEach((file) => {
+      formData.append('files', file);
+    });
+
+    return fetchWithAuth('/v1/face/enroll', {
+      method: 'POST',
+      body: formData,
+    });
+  },
+
+  reenrollFace: async (imageFileList: File[]) => {
+    const formData = new FormData();
+    imageFileList.forEach((file) => {
+      formData.append('files', file);
+    });
+
+    return fetchWithAuth('/v1/face/re-enroll', {
+      method: 'PUT',
       body: formData,
     });
   },

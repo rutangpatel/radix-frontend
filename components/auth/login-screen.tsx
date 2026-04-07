@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Lock } from 'lucide-react';
-import { authService } from '@/lib/api/services';
+import { authService, userService } from '@/lib/api/services';
+import { ForgotPasswordModal } from './forgot-password-modal';
 
 interface LoginScreenProps {
   onSwitchToSignup: () => void;
@@ -13,6 +14,7 @@ export function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotModal, setShowForgotModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -86,11 +88,13 @@ export function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
             </div>
           </div>
 
-          {/* Forgot Password Link */}
-          <div className="text-right">
-            <a href="#" className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+          {/*button 
+              type="button" 
+              onClick={() => setShowForgotModal(true)}
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            >
               Forgot Password?
-            </a>
+            </button>
           </div>
 
           {error && (
@@ -123,6 +127,10 @@ export function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
           </button>
         </div>
       </div>
+      
+      {showForgotModal && (
+        <ForgotPasswordModal onClose={() => setShowForgotModal(false)} />
+      )}
     </div>
   );
 }

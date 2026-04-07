@@ -8,6 +8,8 @@ import { BottomNav } from '@/components/bottom-nav';
 import { SendPaymentModal } from '@/components/send-payment-modal';
 import { PinVerificationModal } from '@/components/pin-verification-modal';
 import { ReceiveFaceModal } from '@/components/receive-face-modal';
+import { transactionService } from '@/lib/api/services';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'home' | 'history' | 'profile'>('home');
@@ -15,7 +17,9 @@ export default function Home() {
   const [paymentMode, setPaymentMode] = useState<'mobile' | 'radix-id'>('mobile');
   const [pinVerificationOpen, setPinVerificationOpen] = useState(false);
   const [pendingPayment, setPendingPayment] = useState<{ target: string; amount: string; remark: string } | null>(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [receiveFaceOpen, setReceiveFaceOpen] = useState(false);
+  const { toast } = useToast();
 
   const handlePayMobile = () => {
     setPaymentMode('mobile');
@@ -33,10 +37,44 @@ export default function Home() {
     setPinVerificationOpen(true);
   };
 
-  const handleConfirmPin = () => {
-    setPinVerificationOpen(false);
-    setPendingPayment(null);
-    alert('Payment successful!');
+  const handleConfirmPin = async (pin: string) => {
+    if (!pendingPayment) return;
+    setIsProcessingPayment(true);
+    
+    try {
+      if (pendingPayment.target.includes('@')) {
+        await transactionService.payViaRadixId({
+          to_id: pendingPayment.target,
+          amount: Number(pendingPayment.amount),
+          pin: pin,
+          remark: pendingPayment.remark
+        });
+      } else {
+        await transactionService.payViaMobileNo({
+          mob_no: pendingPayment.target,
+          amount: Number(pendingPayment.amount),
+          pin: pin,
+          remark: pendingPayment.remark
+        });
+      }
+      
+      toast({
+        title: "Payment Successful",
+        description: `Successfully sent ₹${pendingPayment.amount} to ${pendingPayment.target}`,
+      });
+      
+      setPinVerificationOpen(false);
+      setPendingPayment(null);
+    } catch (error: any) {
+      console.error('Payment Error:', error);
+      toast({
+        title: "Payment Failed",
+        description: error.message || "An error occurred while processing the payment.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessingPayment(false);
+    }
   };
 
   const handleReceiveFace = () => {
@@ -86,6 +124,7 @@ export default function Home() {
         }}
         payment={pendingPayment}
         onConfirm={handleConfirmPin}
+        isProcessing={isProcessingPayment}
       />
 
       {/* Receive with Face Modal */}

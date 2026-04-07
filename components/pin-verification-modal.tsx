@@ -7,10 +7,11 @@ interface PinVerificationModalProps {
   open: boolean;
   onClose: () => void;
   payment: { target: string; amount: string; remark: string } | null;
-  onConfirm: () => void;
+  onConfirm: (pin: string) => void;
+  isProcessing?: boolean;
 }
 
-export function PinVerificationModal({ open, onClose, payment, onConfirm }: PinVerificationModalProps) {
+export function PinVerificationModal({ open, onClose, payment, onConfirm, isProcessing }: PinVerificationModalProps) {
   const [pin, setPin] = useState('');
   const [showPin, setShowPin] = useState(false);
 
@@ -19,7 +20,7 @@ export function PinVerificationModal({ open, onClose, payment, onConfirm }: PinV
       alert('Please enter a valid 4-digit PIN');
       return;
     }
-    onConfirm();
+    onConfirm(pin);
     setPin('');
     setShowPin(false);
   };
@@ -86,9 +87,10 @@ export function PinVerificationModal({ open, onClose, payment, onConfirm }: PinV
           {/* Confirm Button */}
           <button
             onClick={handleConfirm}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold transition-colors"
+            disabled={isProcessing}
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold transition-colors disabled:bg-blue-400"
           >
-            Confirm Payment
+            {isProcessing ? 'Processing Transaction...' : 'Confirm Payment'}
           </button>
 
           {/* Cancel Button */}

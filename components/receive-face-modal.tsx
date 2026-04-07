@@ -11,23 +11,31 @@ interface ReceiveFaceModalProps {
 export function ReceiveFaceModal({ open, onClose }: ReceiveFaceModalProps) {
   const [amount, setAmount] = useState('');
   const [isScanning, setIsScanning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleProcess = () => {
     if (!amount) {
-      alert('Please enter an amount');
+      setError('Please enter an amount');
       return;
     }
-    alert(`Received ₹${amount} via Face Recognition!`);
-    setAmount('');
-    setIsScanning(false);
-    onClose();
+    setError(null);
+    setSuccess(`Received ₹${amount} via Face Recognition!`);
+    
+    // Simulate short delay then close
+    setTimeout(() => {
+      setAmount('');
+      setIsScanning(false);
+      setSuccess(null);
+      onClose();
+    }, 1500);
   };
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-end z-50 p-4">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl mx-auto max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 max-w-md mx-auto bg-white/40 backdrop-blur-sm flex items-end sm:items-center p-4">
+      <div className="w-full bg-white rounded-3xl shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between rounded-t-3xl">
           <h2 className="text-xl font-bold text-slate-900">Receive with Face</h2>
@@ -39,8 +47,18 @@ export function ReceiveFaceModal({ open, onClose }: ReceiveFaceModalProps) {
           </button>
         </div>
 
-        {/* Content */}
         <div className="p-6 space-y-4">
+          {error && (
+            <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="p-3 rounded-xl bg-green-50 text-green-600 text-sm border border-green-100">
+              {success}
+            </div>
+          )}
+
           {/* Scanning Viewfinder */}
           <div className="relative w-full aspect-square bg-gradient-to-b from-blue-50 to-slate-50 rounded-3xl border-2 border-blue-200 overflow-hidden flex items-center justify-center mb-4">
             {!isScanning ? (

@@ -21,8 +21,11 @@ export async function fetchWithAuth(
     headers.set('Authorization', `Bearer ${token}`);
   }
 
+  // Safely check for FormData to avoid Content-Type JSON override
+  const isFormData = options.body && options.body.constructor && options.body.constructor.name === 'FormData';
+
   // Set default content type if not doing multipart/form-data
-  if (!(options.body instanceof FormData) && !headers.has('Content-Type') && options.method !== 'GET') {
+  if (!isFormData && !(options.body instanceof FormData) && !headers.has('Content-Type') && options.method !== 'GET') {
     headers.set('Content-Type', 'application/json');
   }
 
@@ -43,7 +46,13 @@ export async function fetchWithAuth(
     let errorMessage = 'An error occurred';
     try {
       const errorData = await response.json();
-      errorMessage = errorData.detail || errorData.message || errorMessage;
+      if (errorData.detail) {
+        errorMessage = Array.isArray(errorData.detail)
+          ? errorData.detail.map((e: any) => e.msg || JSON.stringify(e)).join(', ')
+          : errorData.detail;
+      } else {
+        errorMessage = errorData.message || errorMessage;
+      }
     } catch {
       // Ignore if not JSON
     }

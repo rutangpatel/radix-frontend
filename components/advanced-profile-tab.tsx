@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Camera, Fingerprint, Lock, LogOut, User, AtSign, AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { getUserName, getUserInitials } from '@/lib/auth-utils';
+import { getUserName, getUserInitials, getUserIdentifier } from '@/lib/auth-utils';
 import { PinManagementModal } from './pin-management-modal';
+import { ProfilePhotoModal } from './profile-photo-modal';
 import { userService, faceService } from '@/lib/api/services';
 import { useToast } from '@/hooks/use-toast';
 
@@ -16,8 +17,10 @@ export function AdvancedProfileTab() {
   const [userName, setUserName] = useState('...');
   const [initials, setInitials] = useState('M');
   const [isFaceEnrolled, setIsFaceEnrolled] = useState(true);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   
   const [showPinModal, setShowPinModal] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -40,6 +43,21 @@ export function AdvancedProfileTab() {
       }
     };
     checkFace();
+
+    const fetchPhoto = async () => {
+      try {
+        const userId = getUserIdentifier();
+        if (userId) {
+          const res = await userService.getProfilePhoto(userId);
+          if (res && res.profile_photo) {
+            setPhotoUrl(res.profile_photo);
+          }
+        }
+      } catch (err: any) {
+        // silently handled network error
+      }
+    };
+    fetchPhoto();
   }, []);
 
   const handleLogout = () => {
@@ -97,22 +115,18 @@ export function AdvancedProfileTab() {
       <div className="p-6 bg-white rounded-3xl border border-slate-200 text-center shadow-sm">
         <div className="relative w-20 h-20 mx-auto mb-4">
           <div className="w-full h-full rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
-            {/* Assume a state var for photoUrl could go here, fallback to initials */}
-            <span className="text-blue-900 font-bold text-3xl">{initials}</span>
+            {photoUrl ? (
+              <img src={photoUrl} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-blue-900 font-bold text-3xl">{initials}</span>
+            )}
           </div>
           <button 
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => setShowPhotoModal(true)}
             className="absolute bottom-0 right-0 p-1.5 bg-blue-600 text-white rounded-full border-2 border-white hover:bg-blue-700 transition-colors shadow-sm"
           >
             <Camera className="w-4 h-4" />
           </button>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            className="hidden" 
-            accept="image/*"
-            onChange={handlePhotoUpload}
-          />
         </div>
         <h2 className="text-2xl font-bold text-slate-900 mb-1 capitalize">{userName}</h2>
         <p className="text-sm text-slate-600">Verified User</p>
@@ -226,6 +240,21 @@ export function AdvancedProfileTab() {
             </div>
           </div>
         </div>
+      )}
+
+      {showPhotoModal && (
+        <ProfilePhotoModal 
+          onClose={() => setShowPhotoModal(false)} 
+          onSuccess={(url) => {
+            setShowPhotoModal(false);
+            toast({
+              title: "Profile Photo Updated",
+              description: "Your profile photo has been successfully updated."
+            });
+            // Give NextJS Image a tiny bit to reload or rely on a global cache
+          }}
+          initials={initials}
+        />
       )}
     </div>
   );

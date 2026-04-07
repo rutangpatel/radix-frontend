@@ -14,12 +14,14 @@ export function SendPaymentModal({ open, onClose, mode, onProceedToPay }: SendPa
   const [target, setTarget] = useState('');
   const [amount, setAmount] = useState('');
   const [remark, setRemark] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleProceed = () => {
     if (!target || !amount) {
-      alert('Please fill in all required fields');
+      setError('Please fill in all required fields');
       return;
     }
+    setError(null);
     onProceedToPay(target, amount, remark);
     setTarget('');
     setAmount('');
@@ -29,8 +31,8 @@ export function SendPaymentModal({ open, onClose, mode, onProceedToPay }: SendPa
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-end z-50 p-4">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl mx-auto max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 max-w-md mx-auto bg-white/40 backdrop-blur-sm flex items-end sm:items-center p-4">
+      <div className="w-full bg-white rounded-3xl shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between rounded-t-3xl">
           <h2 className="text-xl font-bold text-slate-900">
@@ -46,6 +48,12 @@ export function SendPaymentModal({ open, onClose, mode, onProceedToPay }: SendPa
 
         {/* Content */}
         <div className="p-6 space-y-4">
+          {error && (
+            <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
+              {error}
+            </div>
+          )}
+
           {/* Target Input */}
           <div>
             <label className="block text-sm font-semibold text-slate-900 mb-2">

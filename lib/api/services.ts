@@ -64,9 +64,23 @@ export const userService = {
     });
   },
 
+  getProfilePhoto: async (userId: string) => {
+    const result = await fetchWithAuth(`/v1/users/photo?user_id=${userId}`, {
+      method: 'GET',
+    });
+    return { profile_photo: typeof result === 'string' ? result : null };
+  },
+
+  getUserPhotoById: async (userId: string) => {
+    const result = await fetchWithAuth(`/v1/users/photo?user_id=${userId}`, {
+      method: 'GET',
+    });
+    return { profile_photo: typeof result === 'string' ? result : null };
+  },
+
   uploadProfilePhoto: async (imageFile: File) => {
     const formData = new FormData();
-    formData.append('file', imageFile);
+    formData.append('image', imageFile);
 
     return fetchWithAuth('/v1/users/profile_photo', {
       method: 'PUT',

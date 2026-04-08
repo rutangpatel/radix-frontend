@@ -16,6 +16,7 @@ export function PinVerificationModal({ open, onClose, payment, onConfirm, isProc
   const [showPin, setShowPin] = useState(false);
 
   const handleConfirm = () => {
+    if (isProcessing) return;
     if (pin.length !== 4) {
       alert('Please enter a valid 4-digit PIN');
       return;

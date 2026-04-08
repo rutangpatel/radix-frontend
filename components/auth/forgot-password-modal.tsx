@@ -19,6 +19,7 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
     setIsLoading(true);
     
     try {

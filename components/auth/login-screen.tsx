@@ -21,6 +21,7 @@ export function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
     setIsLoading(true);
     setError(null);
     

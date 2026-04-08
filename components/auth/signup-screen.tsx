@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Lock, Camera } from 'lucide-react';
+import { useState } from 'react';
+import { Eye, EyeOff, Lock, CheckCircle } from 'lucide-react';
 import { userService } from '@/lib/api/services';
 
 interface SignupScreenProps {
@@ -11,9 +10,6 @@ interface SignupScreenProps {
 
 export function SignupScreen({ onSwitchToLogin }: SignupScreenProps) {
   const [fullName, setFullName] = useState('');
-  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [photoError, setPhotoError] = useState<string | null>(null);
   const [mobileNumber, setMobileNumber] = useState('');
   const [password, setPassword] = useState('');
   const [pin, setPin] = useState('');
@@ -22,45 +18,17 @@ export function SignupScreen({ onSwitchToLogin }: SignupScreenProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      setPhotoError('Please select a valid image file');
-      setProfilePhoto(null);
-      setPhotoPreview(null);
-      return;
-    }
-
-    if (file.size > 1024 * 1024) {
-      setPhotoError('Image size must be less than 1MB');
-      setProfilePhoto(null);
-      setPhotoPreview(null);
-      return;
-    }
-
-    setPhotoError(null);
-    setProfilePhoto(file);
-    const objectUrl = URL.createObjectURL(file);
-    setPhotoPreview(objectUrl);
-  };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
+    
     if (password.length < 8) {
       setError('Password must be at least 8 characters');
       return;
     }
     if (pin.length !== 4) {
       setError('PIN must be exactly 4 digits');
-      return;
-    }
-    if (photoError) {
-      setError('Please fix the profile photo issue before proceeding');
       return;
     }
     
@@ -76,16 +44,15 @@ export function SignupScreen({ onSwitchToLogin }: SignupScreenProps) {
         pin: pin,
         useNameForRadixId: useNameForRadixId
       });
-      // TODO: upload photo after login and store the file in state for now
-      // (Since upload requires an auth token, signup → auto-login → upload photo)
-      setSuccess('Signup successful! Please login.');
+      
+      setSuccess('Account created securely! Redirecting to login...');
       setTimeout(() => {
+        setIsLoading(false);
         onSwitchToLogin();
       }, 1500);
     } catch (err: any) {
       console.error('Signup error:', err);
       setError(err.message || 'Failed to create account');
-    } finally {
       setIsLoading(false);
     }
   };
@@ -121,41 +88,6 @@ export function SignupScreen({ onSwitchToLogin }: SignupScreenProps) {
               onChange={(e) => setFullName(e.target.value)}
               required
               className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-            />
-          </div>
-
-          {/* Profile Photo Upload */}
-          <div>
-            <label className="block text-sm font-semibold text-slate-900 mb-2">
-              Profile Photo
-            </label>
-            <div className="flex flex-col items-center">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="w-24 h-24 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {photoPreview ? (
-                  <img
-                    src={photoPreview}
-                    alt="Profile Preview"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <Camera className="w-8 h-8 text-slate-400" />
-                )}
-              </button>
-              <p className="text-xs text-slate-500 mt-2">Optional — you can add this later</p>
-              {photoError && (
-                <p className="text-xs text-red-600 mt-1">{photoError}</p>
-              )}
-            </div>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              ref={fileInputRef}
-              onChange={handlePhotoChange}
             />
           </div>
 
@@ -238,8 +170,8 @@ export function SignupScreen({ onSwitchToLogin }: SignupScreenProps) {
             </div>
           )}
           {success && (
-            <div className="p-3 mb-2 rounded-xl bg-green-50 text-green-600 text-sm border border-green-100">
-              {success}
+            <div className="p-3 mb-2 rounded-xl bg-green-50 text-green-600 text-sm border border-green-100 flex items-center justify-center gap-2 font-medium">
+              <CheckCircle className="w-5 h-5"/> {success}
             </div>
           )}
 
@@ -261,7 +193,8 @@ export function SignupScreen({ onSwitchToLogin }: SignupScreenProps) {
           Already have an account?{' '}
           <button
             onClick={onSwitchToLogin}
-            className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+            disabled={isLoading}
+            className="text-blue-600 hover:text-blue-700 font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Log in
           </button>

@@ -1,6 +1,8 @@
 'use client';
 
-import { X } from 'lucide-react';
+import { useState } from 'react';
+import { getInitials } from '@/lib/utils';
+import { UserAvatar } from './user-avatar';
 
 interface TransactionDetailProps {
   transaction: {
@@ -29,27 +31,11 @@ export function TransactionDetail({ transaction, onClose }: TransactionDetailPro
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 shrink-0">
-              <div className={`w-full h-full rounded-full flex items-center justify-center font-bold text-lg overflow-hidden ${
-                transaction.profilePhoto ? 'bg-slate-100' : transaction.type === 'received' ? 'bg-blue-100 text-blue-900' : 'bg-slate-200 text-slate-700'
-              }`}>
-                {transaction.profilePhoto ? (
-                  <img src={transaction.profilePhoto} alt="User Profile" className="w-full h-full object-cover" />
-                ) : (
-                  transaction.fromAvatar
-                )}
-              </div>
-            </div>
+            <UserAvatar src={transaction.profilePhoto} name={transaction.fromName} className="w-12 h-12 text-lg" />
             <div>
               <p className="font-semibold text-slate-900 text-lg">{displayId}</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 hover:bg-slate-100 rounded-full transition-colors self-start"
-          >
-            <X size={24} className="text-slate-900" />
-          </button>
         </div>
 
         {/* Amount Display */}

@@ -1,9 +1,12 @@
 'use client';
 
-import { ChevronRight, ArrowDown, ArrowUp } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { TransactionDetail } from './transaction-detail';
 import { transactionService } from '@/lib/api/services';
+import { getUserIdentifier } from '@/lib/auth-utils';
+import { getInitials } from '@/lib/utils';
+import { UserAvatar } from './user-avatar';
 
 function TransactionItem({ txn, onClick }: { txn: any, onClick: () => void }) {
   return (
@@ -12,17 +15,7 @@ function TransactionItem({ txn, onClick }: { txn: any, onClick: () => void }) {
       className="w-full flex items-center justify-between p-3 sm:p-4 rounded-2xl bg-slate-50 hover:bg-slate-100 transition-colors text-left gap-2"
     >
       <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-        <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-bold overflow-hidden ${
-          txn.profilePhoto ? 'bg-slate-100' : txn.type === 'received' ? 'bg-blue-100 text-blue-600' : 'bg-slate-200 text-slate-700'
-        }`}>
-          {txn.profilePhoto ? (
-            <img src={txn.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
-          ) : txn.type === 'received' ? (
-            <ArrowDown size={20} />
-          ) : (
-            <ArrowUp size={20} />
-          )}
-        </div>
+        <UserAvatar src={txn.profilePhoto} name={txn.fromName} className="w-10 h-10 text-sm" />
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-slate-900 text-sm sm:text-base truncate">{txn.fromName}</p>
           <p className="text-xs text-slate-500 truncate">{txn.remark}</p>
@@ -39,7 +32,6 @@ function TransactionItem({ txn, onClick }: { txn: any, onClick: () => void }) {
     </button>
   );
 }
-import { getUserIdentifier } from '@/lib/auth-utils';
 
 interface Transaction {
   id: string;
@@ -74,20 +66,18 @@ export function RecentActivity() {
           
           let dTime = t.time || 'Unknown';
           if (t.time) {
-            try {
-              const d = new Date(t.time);
-              if (!isNaN(d.getTime())) {
-                const year = d.getFullYear();
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                const hours = String(d.getHours()).padStart(2, '0');
-                const minutes = String(d.getMinutes()).padStart(2, '0');
-                dTime = `${year}-${month}-${day} ${hours}:${minutes}`;
-              }
-            } catch (e) {
-              // fallback
+            const d = new Date(t.time);
+            if (!isNaN(d.getTime())) {
+              const dd = String(d.getDate()).padStart(2, '0');
+              const mm = String(d.getMonth() + 1).padStart(2, '0');
+              const yyyy = d.getFullYear();
+              dTime = `${dd}-${mm}-${yyyy} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
             }
           }
+
+          const photoUrl = t.profile_photo || '';
+          const isValidPhoto = photoUrl.startsWith('http') || photoUrl.startsWith('data:') || photoUrl.startsWith('blob:') || photoUrl.startsWith('/');
+          const realName = isValidPhoto ? displayName : (photoUrl || displayName);
           
           return {
             id: t.transaction_id,
@@ -97,14 +87,14 @@ export function RecentActivity() {
             type: isReceived ? 'received' : 'sent',
             remark: t.remark || 'Transfer',
             dateTime: dTime,
-            fromName: displayName,
-            fromAvatar: displayName.charAt(0).toUpperCase(),
-            profilePhoto: t.profile_photo,
+            fromName: realName,
+            fromAvatar: realName.charAt(0).toUpperCase(),
+            profilePhoto: isValidPhoto ? photoUrl : null,
           };
         });
         setTransactions(mapped);
-      } catch (error: any) {
-        // silently handled network error
+      } catch (error) {
+        // Silently handle error (e.g. backend 500 resulting in CORS network failure) 
       } finally {
         setIsLoading(false);
       }

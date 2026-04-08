@@ -3,21 +3,40 @@
 import { useState, useEffect } from 'react';
 import { Fingerprint, Lock, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { getUserName, getUserInitials } from '@/lib/auth-utils';
+import { getUserName, getUserIdentifier } from '@/lib/auth-utils';
+import { userService } from '@/lib/api/services';
+import { UserAvatar } from './user-avatar';
 
 export function ProfileTab() {
   const router = useRouter();
   const [userName, setUserName] = useState('...');
-  const [initials, setInitials] = useState('M');
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
 
   useEffect(() => {
     const name = getUserName();
     if (name) {
       setUserName(name);
-      setInitials(getUserInitials(name));
     } else {
       setUserName('My Account');
     }
+
+    const fetchProfilePhoto = async () => {
+      try {
+        const userId = getUserIdentifier();
+        if (userId) {
+          const res = await userService.getProfilePhoto(userId);
+          const photoUrl = res.profile_photo || '';
+          // Only use as an image if it's a valid URL or base64 data string
+          // The backend might return the user's name if they don't have a photo
+          if (photoUrl.startsWith('http') || photoUrl.startsWith('data:image') || photoUrl.startsWith('blob:') || photoUrl.startsWith('/')) {
+            setProfilePhoto(photoUrl);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load profile photo:', error);
+      }
+    };
+    fetchProfilePhoto();
   }, []);
 
   const handleLogout = () => {
@@ -29,9 +48,11 @@ export function ProfileTab() {
     <div className="pb-8 space-y-5 sm:space-y-6">
       {/* Profile Header */}
       <div className="p-5 sm:p-6 bg-white rounded-3xl border border-slate-200 text-center shadow-sm">
-        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-2 sm:mb-3">
-          <span className="text-blue-900 font-bold text-xl sm:text-2xl">{initials}</span>
-        </div>
+        <UserAvatar 
+          src={profilePhoto} 
+          name={userName} 
+          className="w-14 h-14 sm:w-16 sm:h-16 text-xl sm:text-2xl mx-auto mb-2 sm:mb-3" 
+        />
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-0.5 sm:mb-1 capitalize">{userName}</h2>
         <p className="text-xs sm:text-sm text-slate-600">Verified User</p>
       </div>

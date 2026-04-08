@@ -143,7 +143,7 @@ export function ReceiveFaceModal({ isOpen, onClose, onSuccessCallback }: Receive
           ) : step === 1 ? (
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-semibold text-slate-700 mb-1 block">Amount (₦)</label>
+                <label className="text-sm font-semibold text-slate-700 mb-1 block">Amount (₹)</label>
                 <Input 
                   type="number" 
                   value={amount}

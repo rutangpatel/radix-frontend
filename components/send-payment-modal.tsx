@@ -36,7 +36,7 @@ export function SendPaymentModal({ open, onClose, mode, onProceedToPay }: SendPa
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between rounded-t-3xl">
           <h2 className="text-xl font-bold text-slate-900">
-            Send {mode === 'mobile' ? 'via Mobile' : 'via @RadixID'}
+            Send {mode === 'mobile' ? 'via Mobile' : 'via Radix ID'}
           </h2>
           <button
             onClick={onClose}
@@ -57,7 +57,7 @@ export function SendPaymentModal({ open, onClose, mode, onProceedToPay }: SendPa
           {/* Target Input */}
           <div>
             <label className="block text-sm font-semibold text-slate-900 mb-2">
-              {mode === 'mobile' ? 'Mobile Number' : '@RadixID'}
+              {mode === 'mobile' ? 'Mobile Number *' : 'Radix ID *'}
             </label>
             <input
               type="text"

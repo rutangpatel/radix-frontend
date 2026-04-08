@@ -85,6 +85,9 @@ export function ReceiveFaceModal({ isOpen, onClose, onSuccessCallback }: Receive
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // Flip the canvas context horizontally before drawing since the video is visually flipped
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
     
     canvas.toBlob(async (blob) => {
@@ -184,7 +187,7 @@ export function ReceiveFaceModal({ isOpen, onClose, onSuccessCallback }: Receive
                   autoPlay 
                   playsInline 
                   muted 
-                  className="w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-cover -scale-x-100"
                 />
                 
                 <div className="absolute inset-0 pointer-events-none border-[3px] border-dashed border-white/50 rounded-full m-8 animate-pulse" />

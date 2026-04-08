@@ -58,14 +58,8 @@ export const userService = {
     });
   },
 
-  updateRadixId: async (data: { name_in_id: boolean }) => {
-    return fetchWithAuth(`/v1/users/update?name_in_id=${data.name_in_id}`, {
-      method: 'PUT',
-    });
-  },
-
   getProfilePhoto: async (userId: string) => {
-    const result = await fetchWithAuth(`/v1/users/photo?user_id=${userId}`, {
+    const result = await fetchWithAuth(`/v1/users/photo`, {
       method: 'GET',
     });
     return { profile_photo: typeof result === 'string' ? result : null };
@@ -135,10 +129,12 @@ export const faceService = {
   facePayment: async (imageFile: File, amount: number, remark: string) => {
     const formData = new FormData();
     formData.append('image', imageFile);
-    formData.append('amount', amount.toString());
-    formData.append('remark', remark);
 
-    return fetchWithAuth('/v1/face/pay', {
+    const qs = new URLSearchParams();
+    if (amount) qs.append('amount', amount.toString());
+    if (remark) qs.append('remark', remark);
+
+    return fetchWithAuth(`/v1/face/pay?${qs.toString()}`, {
       method: 'POST',
       body: formData,
     });
@@ -147,7 +143,7 @@ export const faceService = {
   enrollFace: async (imageFileList: File[]) => {
     const formData = new FormData();
     imageFileList.forEach((file) => {
-      formData.append('files', file);
+      formData.append('images', file);
     });
 
     return fetchWithAuth('/v1/face/enroll', {
@@ -159,7 +155,7 @@ export const faceService = {
   reenrollFace: async (imageFileList: File[]) => {
     const formData = new FormData();
     imageFileList.forEach((file) => {
-      formData.append('files', file);
+      formData.append('images', file);
     });
 
     return fetchWithAuth('/v1/face/re-enroll', {

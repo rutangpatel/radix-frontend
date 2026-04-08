@@ -41,7 +41,7 @@ export function AdvancedProfileTab() {
     const checkFace = async () => {
       try {
         const res = await faceService.checkFaceStatus();
-        setIsFaceEnrolled(res.status === 'True');
+        setIsFaceEnrolled(res.enrolled === true || res.status === 'True');
       } catch (err) {
         setIsFaceEnrolled(false);
       }
@@ -187,7 +187,22 @@ export function AdvancedProfileTab() {
       )}
 
       {showFaceModal && (
-        <FaceEnrollmentModal isOpen={showFaceModal} onClose={() => setShowFaceModal(false)} />
+        <FaceEnrollmentModal 
+          isOpen={showFaceModal} 
+          onClose={() => {
+            setShowFaceModal(false);
+            // Refresh face status so the "Active" badge appears immediately
+            const checkFace = async () => {
+              try {
+                const res = await faceService.checkFaceStatus();
+                setIsFaceEnrolled(res.enrolled === true || res.status === 'True');
+              } catch (err) {
+                setIsFaceEnrolled(false);
+              }
+            };
+            checkFace();
+          }} 
+        />
       )}
 
       {/* Delete Confirmation Dialog */}

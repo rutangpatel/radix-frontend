@@ -15,8 +15,8 @@ interface FaceEnrollmentModalProps {
 export function FaceEnrollmentModal({ isOpen, onClose }: FaceEnrollmentModalProps) {
   const { toast } = useToast();
   
-  // Step 1: Check Status, Step 2: Upload Files
-  const [step, setStep] = useState<1 | 2>(1);
+  // Step 1: Check Status, Step 2: Upload Files, Step 3: Success
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [isLoadingStatus, setIsLoadingStatus] = useState(true);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -82,11 +82,7 @@ export function FaceEnrollmentModal({ isOpen, onClose }: FaceEnrollmentModalProp
         await faceService.enrollFace(validFiles);
       }
       
-      toast({
-        title: "Success",
-        description: "Face enrollment completed successfully.",
-      });
-      onClose();
+      setStep(3);
     } catch (error: any) {
       toast({
         title: "Enrollment Failed",
@@ -198,12 +194,37 @@ export function FaceEnrollmentModal({ isOpen, onClose }: FaceEnrollmentModalProp
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
-                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Submitting</>
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Uploading...
+                    </>
                   ) : (
-                    <><UploadCloud className="w-4 h-4 mr-2" /> Upload & Enroll</>
+                    "Submit Photos"
                   )}
                 </Button>
               </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="flex flex-col items-center justify-center p-6 space-y-6 text-center animate-in fade-in">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-2">
+                <CheckCircle className="w-10 h-10 text-green-600" />
+              </div>
+              
+              <div className="space-y-2">
+                <h3 className="text-2xl font-bold text-slate-900">Enrollment Complete</h3>
+                <p className="text-slate-500">
+                  Your face identity has been successfully registered. You can now use it to securely authorize payments.
+                </p>
+              </div>
+
+              <Button 
+                onClick={onClose} 
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-8"
+              >
+                Close
+              </Button>
             </div>
           )}
         </div>

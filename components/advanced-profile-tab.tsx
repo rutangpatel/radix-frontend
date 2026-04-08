@@ -24,6 +24,7 @@ export function AdvancedProfileTab() {
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const name = getUserName();
@@ -80,6 +81,8 @@ export function AdvancedProfileTab() {
   };
 
   const handleUpdateRadixId = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
     const newFormat = confirm('Click OK to use your Name for Radix ID, or Cancel to use your Mobile Number.') ? true : false;
     try {
       await userService.updateRadixId({ name_in_id: newFormat });
@@ -87,6 +90,8 @@ export function AdvancedProfileTab() {
     } catch (error: any) {
       console.error('Failed to update Radix ID', error);
       toast({ title: "Failed to update ID format", description: error.message, variant: "destructive" });
+    } finally {
+      setIsLoading(false);
     }
   };
 

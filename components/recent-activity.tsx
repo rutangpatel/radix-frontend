@@ -66,12 +66,20 @@ export function RecentActivity() {
           
           let dTime = t.time || 'Unknown';
           if (t.time) {
-            const d = new Date(t.time);
-            if (!isNaN(d.getTime())) {
-              const dd = String(d.getDate()).padStart(2, '0');
-              const mm = String(d.getMonth() + 1).padStart(2, '0');
-              const yyyy = d.getFullYear();
-              dTime = `${dd}-${mm}-${yyyy} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+            try {
+              const [datePart, timePart] = t.time.split(' ');
+              const [day, month, year] = datePart.split('-');
+              const [hour, minute] = timePart.split(':');
+              const d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
+              
+              if (!isNaN(d.getTime())) {
+                const dd = String(d.getDate()).padStart(2, '0');
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const yyyy = d.getFullYear();
+                dTime = `${dd}-${mm}-${yyyy} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+              }
+            } catch (e) {
+              dTime = t.time; // fallback
             }
           }
 

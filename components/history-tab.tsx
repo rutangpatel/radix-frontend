@@ -65,14 +65,23 @@ export function HistoryTab() {
           let timeStr = 'Unknown';
           
           if (t.time) {
-            const d = new Date(t.time);
-            if (!isNaN(d.getTime())) {
-              const dd = String(d.getDate()).padStart(2, '0');
-              const mm = String(d.getMonth() + 1).padStart(2, '0');
-              const yyyy = d.getFullYear();
-              dateStr = `${dd}-${mm}-${yyyy}`;
-              timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            } else {
+            try {
+              const [datePart, timePart] = t.time.split(' ');
+              const [day, month, year] = datePart.split('-');
+              const [hour, minute] = timePart.split(':');
+              const d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
+              
+              if (!isNaN(d.getTime())) {
+                const dd = String(d.getDate()).padStart(2, '0');
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const yyyy = d.getFullYear();
+                dateStr = `${dd}-${mm}-${yyyy}`;
+                timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              } else {
+                dateStr = t.time;
+                timeStr = t.time;
+              }
+            } catch(e) {
               dateStr = t.time;
               timeStr = t.time;
             }

@@ -26,12 +26,16 @@ export function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
     setError(null);
     
     try {
-      const response = await authService.login(identifier, password);
+      let finalIdentifier = identifier.trim();
+      if (finalIdentifier && !finalIdentifier.includes('@')) {
+        finalIdentifier = `${finalIdentifier}@radix`;
+      }
+      const response = await authService.login(finalIdentifier, password);
       // Store the token
       localStorage.setItem('access_token', response.access_token);
       router.push('/dashboard');
     } catch (err: any) {
-      console.error('Login error:', err);
+      // Remove console.error to prevent Next.js dev overlay from popping up
       setError(err.message || 'Failed to login');
     } finally {
       setIsLoading(false);
@@ -52,6 +56,11 @@ export function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
       {/* Form Area */}
       <div className="flex-1 flex flex-col px-4 sm:px-6 py-6 sm:py-8 overflow-y-auto">
         <form onSubmit={handleLogin} className="space-y-5 sm:space-y-6">
+          {error && (
+            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
+              {error}
+            </div>
+          )}
           {/* Radix ID / Mobile Number */}
           <div>
             <label className="block text-sm font-semibold text-slate-900 mb-2">
@@ -59,7 +68,7 @@ export function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
             </label>
             <input
               type="text"
-              placeholder="e.g., rutang@radix or 9876543210"
+              placeholder="e.g., johndoe@radix or 9876543210@radix"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"

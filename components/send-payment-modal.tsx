@@ -61,7 +61,7 @@ export function SendPaymentModal({ open, onClose, mode, onProceedToPay }: SendPa
             </label>
             <input
               type="text"
-              placeholder={mode === 'mobile' ? '+91 98765 43210' : 'john.radix'}
+              placeholder={mode === 'mobile' ? '+91 98765 43210' : 'johndoe@radix'}
               value={target}
               onChange={(e) => setTarget(e.target.value)}
               className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"

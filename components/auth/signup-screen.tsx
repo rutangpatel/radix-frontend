@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Eye, EyeOff, Lock, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, Lock, CheckCircle, Copy, Check } from 'lucide-react';
 import { userService } from '@/lib/api/services';
 
 interface SignupScreenProps {
@@ -18,6 +18,26 @@ export function SignupScreen({ onSwitchToLogin }: SignupScreenProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const getGeneratedRadixId = () => {
+    if (useNameForRadixId && fullName.trim().length > 0) {
+      return `${fullName.toLowerCase().replace(/\s+/g, '')}@radix`;
+    }
+    if (mobileNumber.trim().length > 0) {
+      return `${mobileNumber}@radix`;
+    }
+    return '...@radix';
+  };
+
+  const handleCopyRadixId = () => {
+    const id = getGeneratedRadixId();
+    if (id !== '...@radix') {
+      navigator.clipboard.writeText(id);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,7 +118,7 @@ export function SignupScreen({ onSwitchToLogin }: SignupScreenProps) {
             </label>
             <input
               type="tel"
-              placeholder="9876543210"
+              placeholder="+91 98765 43210"
               value={mobileNumber}
               onChange={(e) => setMobileNumber(e.target.value.replace(/[^0-9]/g, ''))}
               required
@@ -151,17 +171,37 @@ export function SignupScreen({ onSwitchToLogin }: SignupScreenProps) {
           </div>
 
           {/* Toggle for Radix ID */}
-          <div className="flex items-center gap-3 p-3 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200">
-            <input
-              type="checkbox"
-              id="useNameRadixId"
-              checked={useNameForRadixId}
-              onChange={(e) => setUseNameForRadixId(e.target.checked)}
-              className="w-5 h-5 rounded-lg border border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-200 cursor-pointer"
-            />
-            <label htmlFor="useNameRadixId" className="text-sm font-medium text-slate-900 cursor-pointer flex-1">
-              Use my name for my Radix ID instead of my mobile number
-            </label>
+          <div className="flex flex-col gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="useNameRadixId"
+                checked={useNameForRadixId}
+                onChange={(e) => setUseNameForRadixId(e.target.checked)}
+                className="w-5 h-5 rounded-lg border border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-200 cursor-pointer"
+              />
+              <label htmlFor="useNameRadixId" className="text-sm font-medium text-slate-900 cursor-pointer flex-1">
+                Use my name for my Radix ID instead of my mobile number
+              </label>
+            </div>
+            
+            <div className="bg-white px-3 py-2 rounded-xl border border-slate-200 text-sm flex justify-between items-center">
+              <div className="flex flex-col">
+                <span className="text-xs text-slate-500 font-medium mb-0.5">Your Radix ID will be:</span>
+                <span className="font-semibold text-blue-700 font-mono">
+                  {getGeneratedRadixId()}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleCopyRadixId}
+                disabled={getGeneratedRadixId() === '...@radix'}
+                className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                title="Copy Radix ID"
+              >
+                {copied ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
+              </button>
+            </div>
           </div>
 
           {error && (

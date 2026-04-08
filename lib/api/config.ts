@@ -35,11 +35,24 @@ export async function fetchWithAuth(
   });
 
   if (response.status === 401) {
+    let errorMessage = 'Unauthorized';
+    try {
+      const errorData = await response.clone().json();
+      if (errorData.detail) {
+        errorMessage = errorData.detail;
+      }
+    } catch {
+      // Ignore if not JSON
+    }
+
     if (typeof window !== 'undefined') {
       localStorage.removeItem('access_token');
-      window.location.href = '/';
+      // Only redirect if not already on the login or home page
+      if (window.location.pathname !== '/' && window.location.pathname !== '/login') {
+        window.location.href = '/';
+      }
     }
-    throw new ApiError(401, 'Unauthorized');
+    throw new ApiError(401, errorMessage);
   }
 
   if (!response.ok) {

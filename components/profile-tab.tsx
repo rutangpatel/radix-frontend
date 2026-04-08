@@ -1,91 +1,110 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Fingerprint, Lock, LogOut } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { getUserName, getUserIdentifier } from '@/lib/auth-utils';
-import { userService } from '@/lib/api/services';
-import { UserAvatar } from './user-avatar';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Fingerprint, Lock, LogOut } from "lucide-react";
+import { UserAvatar } from "./user-avatar";
+import { getUserName, getUserIdentifier } from "@/lib/auth-utils";
+import { userService } from "@/lib/api/services";
+
+import { FaceEnrollmentModal } from "./face-enrollment-modal";
 
 export function ProfileTab() {
   const router = useRouter();
-  const [userName, setUserName] = useState('...');
+  const [userName, setUserName] = useState<string>("...");
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+
+  // Modal states
+  const [showFaceEnrollment, setShowFaceEnrollment] = useState(false);
 
   useEffect(() => {
     const name = getUserName();
     if (name) {
       setUserName(name);
-    } else {
-      setUserName('My Account');
     }
-
+    
     const fetchProfilePhoto = async () => {
       try {
-        const userId = getUserIdentifier();
-        if (userId) {
-          const res = await userService.getProfilePhoto(userId);
-          const photoUrl = res.profile_photo || '';
-          // Only use as an image if it's a valid URL or base64 data string
-          // The backend might return the user's name if they don't have a photo
-          if (photoUrl.startsWith('http') || photoUrl.startsWith('data:image') || photoUrl.startsWith('blob:') || photoUrl.startsWith('/')) {
-            setProfilePhoto(photoUrl);
+        const identifier = getUserIdentifier();
+        if (identifier) {
+          const photo = await userService.getProfilePhoto(identifier);
+          if (typeof photo === 'string' && (photo.startsWith('http') || photo.startsWith('data:image') || photo.startsWith('blob:'))) {
+            setProfilePhoto(photo);
           }
         }
       } catch (error) {
-        console.error('Failed to load profile photo:', error);
+        console.error('Failed to fetch profile photo:', error);
       }
     };
+    
     fetchProfilePhoto();
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    router.push('/');
+    localStorage.removeItem("access_token");
+    router.push("/");
   };
 
   return (
-    <div className="pb-8 space-y-5 sm:space-y-6">
+    <div className="flex flex-col h-full bg-slate-50">
       {/* Profile Header */}
-      <div className="p-5 sm:p-6 bg-white rounded-3xl border border-slate-200 text-center shadow-sm">
-        <UserAvatar 
-          src={profilePhoto} 
-          name={userName} 
-          className="w-14 h-14 sm:w-16 sm:h-16 text-xl sm:text-2xl mx-auto mb-2 sm:mb-3" 
-        />
-        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-0.5 sm:mb-1 capitalize">{userName}</h2>
-        <p className="text-xs sm:text-sm text-slate-600">Verified User</p>
+      <div className="bg-white p-6 pb-8 rounded-b-[2rem] shadow-sm mb-6 flex flex-col items-center justify-center">
+        <UserAvatar name={userName} className="w-24 h-24 text-3xl mb-4" src={profilePhoto || undefined} />
+        <h2 className="text-xl font-bold text-slate-800">{userName}</h2>
+        <p className="text-sm font-medium text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full mt-2">
+          Verified User
+        </p>
       </div>
 
       {/* Menu Options */}
-      <div className="space-y-2.5 sm:space-y-3">
-        <button className="w-full flex items-center gap-3 sm:gap-4 p-3.5 sm:p-4 bg-white rounded-2xl border border-slate-200 hover:border-blue-300 hover:shadow-sm transition-all text-left">
-          <Fingerprint className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 shrink-0" />
-          <div className="min-w-0">
-            <p className="font-semibold text-slate-900 text-xs sm:text-sm">Manage Face Enrollment</p>
-            <p className="text-xs text-slate-500">Add or remove Face ID</p>
-          </div>
-        </button>
-
-        <button className="w-full flex items-center gap-3 sm:gap-4 p-3.5 sm:p-4 bg-white rounded-2xl border border-slate-200 hover:border-blue-300 hover:shadow-sm transition-all text-left">
-          <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 shrink-0" />
-          <div className="min-w-0">
-            <p className="font-semibold text-slate-900 text-xs sm:text-sm">Change PIN</p>
-            <p className="text-xs text-slate-500">Update your security PIN</p>
-          </div>
-        </button>
-
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center gap-3 sm:gap-4 p-3.5 sm:p-4 bg-white rounded-2xl border border-slate-200 hover:bg-red-50 hover:border-red-300 transition-all text-left"
+      <div className="px-4 space-y-3 flex-1 overflow-y-auto pb-24">
+        <button 
+          onClick={() => setShowFaceEnrollment(true)}
+          className="w-full bg-white p-4 rounded-xl flex items-center justify-between shadow-sm active:scale-[0.98] transition-all"
         >
-          <LogOut className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 shrink-0" />
-          <div className="min-w-0">
-            <p className="font-semibold text-red-600 text-xs sm:text-sm">Logout</p>
-            <p className="text-xs text-slate-500">Sign out of your account</p>
+          <div className="flex items-center gap-4">
+            <div className="bg-indigo-50 p-3 rounded-full text-indigo-600">
+              <Fingerprint className="w-6 h-6" />
+            </div>
+            <div className="text-left">
+              <h3 className="font-semibold text-slate-800">Face Enrollment</h3>
+              <p className="text-xs text-slate-500">Manage Face ID authentication</p>
+            </div>
+          </div>
+        </button>
+
+        <button className="w-full bg-white p-4 rounded-xl flex items-center justify-between shadow-sm active:scale-[0.98] transition-all">
+          <div className="flex items-center gap-4">
+            <div className="bg-emerald-50 p-3 rounded-full text-emerald-600">
+              <Lock className="w-6 h-6" />
+            </div>
+            <div className="text-left">
+              <h3 className="font-semibold text-slate-800">Change PIN</h3>
+              <p className="text-xs text-slate-500">Update your security PIN</p>
+            </div>
+          </div>
+        </button>
+
+        <button 
+          onClick={handleLogout}
+          className="w-full bg-white p-4 rounded-xl flex items-center justify-between shadow-sm active:scale-[0.98] transition-all border border-red-50 mt-8"
+        >
+          <div className="flex items-center gap-4">
+            <div className="bg-red-50 p-3 rounded-full text-red-600">
+              <LogOut className="w-6 h-6" />
+            </div>
+            <div className="text-left">
+              <h3 className="font-semibold text-red-600">Log Out</h3>
+              <p className="text-xs text-red-400">Securely sign out of Radix</p>
+            </div>
           </div>
         </button>
       </div>
+
+      <FaceEnrollmentModal 
+        isOpen={showFaceEnrollment} 
+        onClose={() => setShowFaceEnrollment(false)} 
+      />
     </div>
   );
 }

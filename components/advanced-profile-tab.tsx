@@ -80,21 +80,6 @@ export function AdvancedProfileTab() {
     }
   };
 
-  const handleUpdateRadixId = async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    const newFormat = confirm('Click OK to use your Name for Radix ID, or Cancel to use your Mobile Number.') ? true : false;
-    try {
-      await userService.updateRadixId({ name_in_id: newFormat });
-      toast({ title: "Radix ID Updated successfully." });
-    } catch (error: any) {
-      console.error('Failed to update Radix ID', error);
-      toast({ title: "Failed to update ID format", description: error.message, variant: "destructive" });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleFaceAuth = async () => {
     // Basic stub, normally you would capture webcam images here
     toast({ title: "Face Auth Flow Triggered", description: "Integration logic for webcam goes here" });
@@ -137,16 +122,6 @@ export function AdvancedProfileTab() {
         <div>
           <h3 className="text-sm font-semibold text-slate-500 mb-2 px-1 uppercase tracking-wider">Account Settings</h3>
           <div className="space-y-2">
-            <button 
-              onClick={handleUpdateRadixId}
-              className="w-full flex items-center gap-4 p-4 bg-white rounded-2xl border border-slate-200 hover:border-blue-300 hover:shadow-sm transition-all text-left"
-            >
-              <AtSign className="w-6 h-6 text-blue-600 shrink-0" />
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-slate-900 text-sm">Update Radix ID</p>
-                <p className="text-sm text-slate-500 truncate">Change your ID format</p>
-              </div>
-            </button>
 
             <button 
               onClick={handleFaceAuth}

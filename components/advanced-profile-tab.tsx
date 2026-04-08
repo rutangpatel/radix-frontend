@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { getUserName, getUserInitials, getUserIdentifier } from '@/lib/auth-utils';
 import { PinManagementModal } from './pin-management-modal';
 import { ProfilePhotoModal } from './profile-photo-modal';
+import { FaceEnrollmentModal } from './face-enrollment-modal';
 import { UserAvatar } from './user-avatar';
 import { userService, faceService } from '@/lib/api/services';
 import { useToast } from '@/hooks/use-toast';
@@ -22,6 +23,7 @@ export function AdvancedProfileTab() {
   
   const [showPinModal, setShowPinModal] = useState(false);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [showFaceModal, setShowFaceModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -81,8 +83,7 @@ export function AdvancedProfileTab() {
   };
 
   const handleFaceAuth = async () => {
-    // Basic stub, normally you would capture webcam images here
-    toast({ title: "Face Auth Flow Triggered", description: "Integration logic for webcam goes here" });
+    setShowFaceModal(true);
   };
 
   const handleDeleteAccount = async () => {
@@ -183,6 +184,10 @@ export function AdvancedProfileTab() {
 
       {showPinModal && (
         <PinManagementModal onClose={() => setShowPinModal(false)} />
+      )}
+
+      {showFaceModal && (
+        <FaceEnrollmentModal isOpen={showFaceModal} onClose={() => setShowFaceModal(false)} />
       )}
 
       {/* Delete Confirmation Dialog */}

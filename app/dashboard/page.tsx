@@ -129,7 +129,7 @@ export default function Home() {
 
       {/* Receive with Face Modal */}
       <ReceiveFaceModal
-        open={receiveFaceOpen}
+        isOpen={receiveFaceOpen}
         onClose={() => setReceiveFaceOpen(false)}
       />
     </div>

@@ -117,7 +117,7 @@ export function FaceEnrollmentModal({ isOpen, onClose }: FaceEnrollmentModalProp
             <div className="space-y-6">
               {isLoadingStatus ? (
                 <div className="flex flex-col items-center justify-center py-10">
-                  <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mb-4" />
+                  <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
                   <p>Checking status...</p>
                 </div>
               ) : (
@@ -152,7 +152,7 @@ export function FaceEnrollmentModal({ isOpen, onClose }: FaceEnrollmentModalProp
                   </div>
 
                   <Button 
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-6 text-lg" 
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg" 
                     onClick={() => setStep(2)}
                   >
                     {isEnrolled ? "Re-enroll Face" : "Start Enrollment"}
@@ -174,7 +174,7 @@ export function FaceEnrollmentModal({ isOpen, onClose }: FaceEnrollmentModalProp
                       <Input 
                         type="file" 
                         accept="image/*"
-                        className="file:bg-indigo-50 file:text-indigo-700 file:border-0 file:rounded-md file:px-3 file:py-1 file:mr-3 text-sm flex-1 bg-white cursor-pointer"
+                        className="file:bg-blue-50 file:text-blue-700 file:border-0 file:rounded-md file:px-3 file:py-1 file:mr-3 text-sm flex-1 bg-white cursor-pointer"
                         onChange={(e) => handleFileChange(idx, e.target.files?.[0] || null)}
                       />
                       {files[idx] && <CheckCircle className="text-emerald-500 w-5 h-5 flex-shrink-0" />}
@@ -193,7 +193,7 @@ export function FaceEnrollmentModal({ isOpen, onClose }: FaceEnrollmentModalProp
                   Back
                 </Button>
                 <Button 
-                  className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white" 
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white" 
                   onClick={handleSubmit}
                   disabled={isSubmitting}
                 >

@@ -16,6 +16,7 @@ interface ReceiveFaceModalProps {
 export function ReceiveFaceModal({ isOpen, onClose, onSuccessCallback }: ReceiveFaceModalProps) {
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   
   const [step, setStep] = useState<1 | 2>(1);
   const [amount, setAmount] = useState("");
@@ -25,9 +26,11 @@ export function ReceiveFaceModal({ isOpen, onClose, onSuccessCallback }: Receive
   const [success, setSuccess] = useState(false);
 
   const stopCamera = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      stream.getTracks().forEach(track => track.stop());
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
   };
@@ -35,6 +38,13 @@ export function ReceiveFaceModal({ isOpen, onClose, onSuccessCallback }: Receive
   useEffect(() => {
     if (!isOpen) {
       stopCamera();
+      // Reset state so that nothing lingers on next open
+      setStep(1);
+      setAmount("");
+      setRemark("");
+      setErrorMsg(null);
+      setSuccess(false);
+      setIsProcessing(false);
     }
     return () => stopCamera();
   }, [isOpen]);
@@ -50,6 +60,7 @@ export function ReceiveFaceModal({ isOpen, onClose, onSuccessCallback }: Receive
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: "user" }
       });
+      streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
@@ -152,7 +163,7 @@ export function ReceiveFaceModal({ isOpen, onClose, onSuccessCallback }: Receive
                 />
               </div>
               <Button 
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-6 text-lg mt-4" 
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg mt-4" 
                 onClick={handleNextStep}
               >
                 Proceed to Scan Face
@@ -202,7 +213,7 @@ export function ReceiveFaceModal({ isOpen, onClose, onSuccessCallback }: Receive
                   Edit Amount
                 </Button>
                 <Button 
-                  className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white gap-2"
+                  className="flex-[2] bg-blue-600 hover:bg-blue-700 text-white gap-2"
                   onClick={captureAndCharge}
                   disabled={isProcessing}
                 >

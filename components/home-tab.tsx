@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { BalanceCard } from './balance-card';
 import { QuickActions } from './quick-actions';
 import { RecentActivity } from './recent-activity';
+import { UserAvatar } from './user-avatar';
 import { getUserIdentifier, getUserName, getUserInitials } from '@/lib/auth-utils';
 import { userService } from '@/lib/api/services';
 
@@ -51,13 +52,7 @@ export function HomeTab({ onPayMobile, onPayRadixId, onReceiveFace }: HomeTabPro
           <p className="text-xs sm:text-sm text-slate-600 font-medium">Welcome,</p>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 truncate capitalize">{userName}</h2>
         </div>
-        <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
-          {photoUrl ? (
-            <img src={photoUrl} alt="Profile" className="w-full h-full object-cover" />
-          ) : (
-            <span className="text-blue-900 font-bold text-sm sm:text-lg">{initials}</span>
-          )}
-        </div>
+        <UserAvatar src={photoUrl} name={userName} className="w-10 h-10 sm:w-12 sm:h-12 text-sm sm:text-lg" />
       </div>
 
       {/* Balance Card */}

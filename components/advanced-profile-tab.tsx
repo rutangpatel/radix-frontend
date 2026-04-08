@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { getUserName, getUserInitials, getUserIdentifier } from '@/lib/auth-utils';
 import { PinManagementModal } from './pin-management-modal';
 import { ProfilePhotoModal } from './profile-photo-modal';
+import { UserAvatar } from './user-avatar';
 import { userService, faceService } from '@/lib/api/services';
 import { useToast } from '@/hooks/use-toast';
 
@@ -114,13 +115,7 @@ export function AdvancedProfileTab() {
       {/* Profile Header */}
       <div className="p-6 bg-white rounded-3xl border border-slate-200 text-center shadow-sm">
         <div className="relative w-20 h-20 mx-auto mb-4">
-          <div className="w-full h-full rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
-            {photoUrl ? (
-              <img src={photoUrl} alt="Profile" className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-blue-900 font-bold text-3xl">{initials}</span>
-            )}
-          </div>
+          <UserAvatar src={photoUrl} name={userName} className="w-full h-full text-3xl" />
           <button 
             onClick={() => setShowPhotoModal(true)}
             className="absolute bottom-0 right-0 p-1.5 bg-blue-600 text-white rounded-full border-2 border-white hover:bg-blue-700 transition-colors shadow-sm"

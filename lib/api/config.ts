@@ -46,10 +46,16 @@ export async function fetchWithAuth(
     }
 
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('access_token');
-      // Only redirect if not already on the login or home page
-      if (window.location.pathname !== '/' && window.location.pathname !== '/login') {
-        window.location.href = '/';
+      // Don't log out if it's a specific known 401 error like Invalid PIN or Incorrect password
+      if (
+        errorMessage !== 'Invalid PIN' && 
+        errorMessage !== 'Old PIN is incorrect' && 
+        errorMessage !== 'Incorrect password'
+      ) {
+        localStorage.removeItem('access_token');
+        if (window.location.pathname !== '/' && window.location.pathname !== '/login') {
+          window.location.href = '/';
+        }
       }
     }
     throw new ApiError(401, errorMessage);

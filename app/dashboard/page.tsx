@@ -18,6 +18,7 @@ export default function Home() {
   const [pinVerificationOpen, setPinVerificationOpen] = useState(false);
   const [pendingPayment, setPendingPayment] = useState<{ target: string; amount: string; remark: string } | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
   const [receiveFaceOpen, setReceiveFaceOpen] = useState(false);
   const { toast } = useToast();
 
@@ -59,14 +60,11 @@ export default function Home() {
       }
       
       toast({
-        title: "Payment Successful",
-        description: `Successfully sent ₹${pendingPayment.amount} to ${pendingPayment.target}`,
+        title: "Payment Successful"
       });
       
-      setPinVerificationOpen(false);
-      setPendingPayment(null);
+      setIsPaymentSuccess(true);
     } catch (error: any) {
-      console.error('Payment Error:', error);
       toast({
         title: "Payment Failed",
         description: error.message || "An error occurred while processing the payment.",
@@ -121,10 +119,12 @@ export default function Home() {
         onClose={() => {
           setPinVerificationOpen(false);
           setPendingPayment(null);
+          setIsPaymentSuccess(false);
         }}
         payment={pendingPayment}
         onConfirm={handleConfirmPin}
         isProcessing={isProcessingPayment}
+        isSuccess={isPaymentSuccess}
       />
 
       {/* Receive with Face Modal */}

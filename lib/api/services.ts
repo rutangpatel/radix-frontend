@@ -45,16 +45,30 @@ export const userService = {
   },
 
   updatePin: async (data: { old_pin: string; new_pin: string }) => {
-    return fetchWithAuth('/v1/users/update-pin', {
+    const params = new URLSearchParams();
+    params.append('old_pin', data.old_pin);
+    params.append('new_pin', data.new_pin);
+
+    return fetchWithAuth('/v1/users/forgot-pin', {
       method: 'PUT',
-      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
     });
   },
 
   forgotPin: async (data: { password: string; new_pin: string }) => {
+    const params = new URLSearchParams();
+    params.append('password', data.password);
+    params.append('new_pin', data.new_pin);
+
     return fetchWithAuth('/v1/users/forgot-pin', {
       method: 'PUT',
-      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
     });
   },
 

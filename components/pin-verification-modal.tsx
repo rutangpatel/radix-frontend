@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Eye, EyeOff, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Eye, EyeOff, X, CheckCircle, Loader2 } from 'lucide-react';
 
 interface PinVerificationModalProps {
   open: boolean;
@@ -9,11 +9,19 @@ interface PinVerificationModalProps {
   payment: { target: string; amount: string; remark: string } | null;
   onConfirm: (pin: string) => void;
   isProcessing?: boolean;
+  isSuccess?: boolean;
 }
 
-export function PinVerificationModal({ open, onClose, payment, onConfirm, isProcessing }: PinVerificationModalProps) {
+export function PinVerificationModal({ open, onClose, payment, onConfirm, isProcessing, isSuccess }: PinVerificationModalProps) {
   const [pin, setPin] = useState('');
   const [showPin, setShowPin] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setPin('');
+      setShowPin(false);
+    }
+  }, [open]);
 
   const handleConfirm = () => {
     if (isProcessing) return;
@@ -22,8 +30,6 @@ export function PinVerificationModal({ open, onClose, payment, onConfirm, isProc
       return;
     }
     onConfirm(pin);
-    setPin('');
-    setShowPin(false);
   };
 
   if (!open || !payment) return null;
@@ -44,63 +50,95 @@ export function PinVerificationModal({ open, onClose, payment, onConfirm, isProc
 
         {/* Content */}
         <div className="p-6 space-y-6">
-          {/* Payment Summary */}
-          <div className="bg-slate-50 rounded-2xl p-4 space-y-3">
-            <div className="flex justify-between">
-              <span className="text-slate-600">To:</span>
-              <span className="font-semibold text-slate-900">{payment.target}</span>
-            </div>
-            <div className="flex justify-between border-t border-slate-200 pt-3">
-              <span className="text-slate-600">Amount:</span>
-              <span className="font-bold text-slate-900">₹{payment.amount}</span>
-            </div>
-            {payment.remark && (
-              <div className="flex justify-between">
-                <span className="text-slate-600">Remark:</span>
-                <span className="text-slate-900">{payment.remark}</span>
+          {isSuccess ? (
+            <div className="flex flex-col items-center justify-center p-2 space-y-6 text-center animate-in fade-in">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-2">
+                <CheckCircle className="w-10 h-10 text-green-600" />
               </div>
-            )}
-          </div>
+              
+              <div className="space-y-2">
+                <h3 className="text-2xl font-bold text-slate-900">Payment Successful</h3>
+                <p className="text-slate-500">
+                  Successfully sent ₹{payment.amount} to {payment.target}
+                </p>
+              </div>
 
-          {/* PIN Input */}
-          <div>
-            <label className="block text-sm font-semibold text-slate-900 mb-2">
-              Enter 4-Digit PIN
-            </label>
-            <div className="relative">
-              <input
-                type={showPin ? 'text' : 'password'}
-                placeholder="••••"
-                maxLength={4}
-                value={pin}
-                onChange={(e) => setPin(e.target.value.replace(/[^0-9]/g, ''))}
-                className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 pr-10 text-center text-2xl tracking-widest"
-              />
-              <button
-                onClick={() => setShowPin(!showPin)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+              <button 
+                onClick={onClose} 
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-2xl py-3 font-semibold transition-colors mt-4"
               >
-                {showPin ? <EyeOff size={20} /> : <Eye size={20} />}
+                Close
               </button>
             </div>
-          </div>
+          ) : (
+            <>
+              {/* Payment Summary */}
+              <div className="bg-slate-50 rounded-2xl p-4 space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-slate-600">To:</span>
+                  <span className="font-semibold text-slate-900 truncate max-w-[200px]">{payment.target}</span>
+                </div>
+                <div className="flex justify-between border-t border-slate-200 pt-3">
+                  <span className="text-slate-600">Amount:</span>
+                  <span className="font-bold text-slate-900">₹{payment.amount}</span>
+                </div>
+                {payment.remark && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Remark:</span>
+                    <span className="text-slate-900 truncate max-w-[200px]">{payment.remark}</span>
+                  </div>
+                )}
+              </div>
 
-          {/* Confirm Button */}
-          <button
-            onClick={handleConfirm}
-            disabled={isProcessing}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold transition-colors disabled:bg-blue-400"
-          >
-            {isProcessing ? 'Processing Transaction...' : 'Confirm Payment'}
-          </button>
+              {/* PIN Input */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-900 mb-2">
+                  Enter 4-Digit PIN
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPin ? 'text' : 'password'}
+                    placeholder="••••"
+                    maxLength={4}
+                    value={pin}
+                    onChange={(e) => setPin(e.target.value.replace(/[^0-9]/g, ''))}
+                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 pr-10 text-center text-2xl tracking-widest"
+                  />
+                  <button
+                    onClick={() => setShowPin(!showPin)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+                  >
+                    {showPin ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+              </div>
 
-          {/* Cancel Button */}
-          <button
-            onClick={onClose}
-            className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-2xl font-semibold transition-colors"
-          >
-            Cancel
-          </button>
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <button
+                  onClick={handleConfirm}
+                  disabled={isProcessing || pin.length !== 4}
+                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold transition-colors disabled:bg-blue-400 flex items-center justify-center gap-2"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" /> Processing...
+                    </>
+                  ) : (
+                    'Confirm Payment'
+                  )}
+                </button>
+
+                <button
+                  onClick={onClose}
+                  disabled={isProcessing}
+                  className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-2xl font-semibold transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

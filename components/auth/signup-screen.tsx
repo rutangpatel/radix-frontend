@@ -89,7 +89,7 @@ export function SignupScreen({ onSwitchToLogin }: SignupScreenProps) {
         <div className="flex items-center justify-center mb-4">
           <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
         </div>
-        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2">Join Radix</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2 select-none">Join Radix</h1>
         <p className="text-sm sm:text-base text-slate-600">Set up your secure digital wallet.</p>
       </div>
 

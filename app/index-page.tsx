@@ -11,7 +11,7 @@ export default function IndexPage() {
           {/* Header */}
           <div className="px-6 py-8 sm:py-12 text-center border-b border-slate-100">
             <Lock className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2">Radix</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2 select-none">Radix</h1>
             <p className="text-slate-600">Secure Digital Wallet</p>
           </div>
 

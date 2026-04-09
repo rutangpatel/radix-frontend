@@ -85,7 +85,7 @@ export default function Home() {
       <div className="w-full h-screen max-w-md mx-auto bg-white flex flex-col overflow-hidden lg:rounded-3xl lg:shadow-2xl lg:h-[90vh] lg:my-4">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-slate-100 px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 z-20">
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Radix</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 select-none">Radix</h1>
         </div>
 
         {/* Content */}

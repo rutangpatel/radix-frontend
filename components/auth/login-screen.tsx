@@ -49,7 +49,7 @@ export function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
         <div className="flex items-center justify-center mb-4">
           <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
         </div>
-        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2">Radix</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2 select-none">Radix</h1>
         <p className="text-sm sm:text-base text-slate-600">Welcome back. Log in to your wallet.</p>
       </div>
 
@@ -64,7 +64,7 @@ export function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
           {/* Radix ID / Mobile Number */}
           <div>
             <label className="block text-sm font-semibold text-slate-900 mb-2">
-              Radix ID or Mobile Number
+              Radix ID
             </label>
             <input
               type="text"
@@ -98,7 +98,8 @@ export function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
             </div>
           </div>
 
-          {/*button 
+          <div className="flex justify-end">
+            <button 
               type="button" 
               onClick={() => setShowForgotModal(true)}
               className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
@@ -106,12 +107,6 @@ export function LoginScreen({ onSwitchToSignup }: LoginScreenProps) {
               Forgot Password?
             </button>
           </div>
-
-          {error && (
-            <div className="p-3 mb-2 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100">
-              {error}
-            </div>
-          )}
 
           {/* Login Button */}
           <button
